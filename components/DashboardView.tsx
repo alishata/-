@@ -68,7 +68,7 @@ const StatCard = ({ title, value, change, isPositive, icon: Icon, color }: any) 
   </motion.div>
 );
 
-export default function DashboardView() {
+export default function DashboardView({ inventory, stats, setStats, setInventory }: any) {
   const [isExporting, setIsExporting] = useState(false);
   const [showExportSuccess, setShowExportSuccess] = useState(false);
   const [showOrderSuccess, setShowOrderSuccess] = useState(false);
@@ -84,11 +84,31 @@ export default function DashboardView() {
 
   const handleRecordSales = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, we would deduct from inventory here
+    const amount = parseFloat(salesAmount);
+    const qty = parseFloat(salesQty);
+    
+    if (isNaN(amount) || isNaN(qty)) return;
+
+    // Deduct from inventory
+    setInventory((prev: any) => prev.map((tank: any) => {
+      if (tank.name === salesFuelType) {
+        return { ...tank, current: Math.max(0, tank.current - qty) };
+      }
+      return tank;
+    }));
+
+    // Add to stats
+    setStats((prev: any) => ({
+      totalRevenue: prev.totalRevenue + amount,
+      totalFuelSold: prev.totalFuelSold + qty,
+      totalTransactions: prev.totalTransactions + 1,
+    }));
+
     setShowSalesModal(false);
     setSalesAmount('');
     setSalesQty('');
-    setShowOrderSuccess(true); // Reuse success toast or create new one
+    setShowOrderSuccess(true);
+    setTimeout(() => setShowOrderSuccess(false), 3000);
   };
 
   const handleExport = () => {
@@ -100,7 +120,7 @@ export default function DashboardView() {
       setTimeout(() => setShowExportSuccess(false), 3000);
       
       // Actual download simulation
-      const content = "رقم العملية,المضخة,نوع الوقود,الكمية,المبلغ,طريقة الدفع,الحالة\n#TR-8942,02,بنزين 85,45.2 لتر,9.85 د.ك,بطاقة,مكتمل";
+      const content = "رقم العملية,المضخة,نوع الوقود,الكمية,المبلغ,طريقة الدفع,الحالة\n#TR-8942,02,بنزين 85,45.2 لتر,9.85 جنيه مصري,بطاقة,مكتمل";
       const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement("a");
       const url = URL.createObjectURL(blob);
@@ -173,7 +193,7 @@ export default function DashboardView() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">المبلغ (د.ك)</label>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">المبلغ (جنيه مصري)</label>
                     <input 
                       type="number"
                       required
@@ -257,7 +277,7 @@ export default function DashboardView() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
           title="إجمالي المبيعات" 
-          value="2,450 د.ك" 
+          value={`${stats.totalRevenue.toLocaleString()} جنيه مصري`} 
           change="+12.5%" 
           isPositive={true} 
           icon={DollarSign} 
@@ -265,7 +285,7 @@ export default function DashboardView() {
         />
         <StatCard 
           title="كمية الوقود المباعة" 
-          value="12,400 لتر" 
+          value={`${stats.totalFuelSold.toLocaleString()} لتر`} 
           change="+5.2%" 
           isPositive={true} 
           icon={Droplets} 
@@ -273,7 +293,7 @@ export default function DashboardView() {
         />
         <StatCard 
           title="عدد العمليات" 
-          value="452" 
+          value={stats.totalTransactions.toLocaleString()} 
           change="-2.4%" 
           isPositive={false} 
           icon={Zap} 
@@ -344,27 +364,30 @@ export default function DashboardView() {
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <h3 className="font-display font-bold text-lg text-slate-900 mb-8">مستويات الوقود الحالية</h3>
           <div className="space-y-8">
-            {fuelLevels.map((fuel) => (
-              <div key={fuel.type} className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: fuel.color }}></div>
-                    <span className="text-sm font-semibold text-slate-700">{fuel.type}</span>
+            {inventory.map((fuel: any) => {
+              const percentage = Math.round((fuel.current / fuel.capacity) * 100);
+              return (
+                <div key={fuel.name} className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: fuel.color }}></div>
+                      <span className="text-sm font-semibold text-slate-700">{fuel.name}</span>
+                    </div>
+                    <span className="text-sm font-bold text-slate-900">{percentage}%</span>
                   </div>
-                  <span className="text-sm font-bold text-slate-900">{fuel.level}%</span>
+                  <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: `${percentage}%` }}
+                      transition={{ duration: 1, ease: "easeOut" }}
+                      className="h-full rounded-full"
+                      style={{ backgroundColor: fuel.color }}
+                    />
+                  </div>
+                  <p className="text-[10px] text-slate-400">المتبقي التقريبي: {fuel.current.toLocaleString()} لتر</p>
                 </div>
-                <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
-                  <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: `${fuel.level}%` }}
-                    transition={{ duration: 1, ease: "easeOut" }}
-                    className="h-full rounded-full"
-                    style={{ backgroundColor: fuel.color }}
-                  />
-                </div>
-                <p className="text-[10px] text-slate-400">المتبقي التقريبي: {Math.round(fuel.level * 250)} لتر</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <button 
             onClick={handleOrderFuel}
@@ -396,10 +419,10 @@ export default function DashboardView() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {[
-                { id: '#TR-8942', pump: '02', type: 'بنزين 85', qty: '45.2 لتر', amount: '9.85 د.ك', method: 'بطاقة', status: 'مكتمل' },
-                { id: '#TR-8941', pump: '05', type: 'ديزل', qty: '120.0 لتر', amount: '13.80 د.ك', method: 'نقدي', status: 'مكتمل' },
-                { id: '#TR-8940', pump: '01', type: 'بنزين 92', qty: '32.5 لتر', amount: '7.54 د.ك', method: 'تطبيق', status: 'مكتمل' },
-                { id: '#TR-8939', pump: '03', type: 'بنزين 85', qty: '20.0 لتر', amount: '4.36 د.ك', method: 'بطاقة', status: 'قيد المعالجة' },
+                { id: '#TR-8942', pump: '02', type: 'بنزين 85', qty: '45.2 لتر', amount: '9.85 جنيه مصري', method: 'بطاقة', status: 'مكتمل' },
+                { id: '#TR-8941', pump: '05', type: 'ديزل', qty: '120.0 لتر', amount: '13.80 جنيه مصري', method: 'نقدي', status: 'مكتمل' },
+                { id: '#TR-8940', pump: '01', type: 'بنزين 92', qty: '32.5 لتر', amount: '7.54 جنيه مصري', method: 'تطبيق', status: 'مكتمل' },
+                { id: '#TR-8939', pump: '03', type: 'بنزين 85', qty: '20.0 لتر', amount: '4.36 جنيه مصري', method: 'بطاقة', status: 'قيد المعالجة' },
               ].map((row, i) => (
                 <tr key={i} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4 text-sm font-medium text-slate-900">{row.id}</td>

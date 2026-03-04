@@ -39,7 +39,7 @@ export default function LockScreen({ onUnlock }: LockScreenProps) {
           <div className="w-20 h-20 bg-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-900/20 mb-6">
             <Fuel size={40} />
           </div>
-          <h1 className="text-2xl font-display font-bold text-white mb-2">GasStation Pro</h1>
+          <h1 className="text-2xl font-display font-bold text-white mb-2">محطة الهواري</h1>
           <p className="text-slate-400 text-sm">النظام مغلق. يرجى إدخال الرقم السري للمتابعة.</p>
         </div>
 
@@ -78,7 +78,7 @@ export default function LockScreen({ onUnlock }: LockScreenProps) {
         </form>
 
         <div className="mt-10 text-center">
-          <p className="text-slate-500 text-xs">© 2026 GasStation Pro - جميع الحقوق محفوظة</p>
+          <p className="text-slate-500 text-xs">© 2026 محطة الهواري - جميع الحقوق محفوظة</p>
         </div>
       </motion.div>
     </div>

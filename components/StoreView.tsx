@@ -14,11 +14,11 @@ import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 
 const products = [
-  { id: 1, name: 'مياه معدنية 500 مل', category: 'مشروبات', price: '0.15 د.ك', stock: 124, status: 'in_stock' },
-  { id: 2, name: 'زيت محرك 10W-40', category: 'زيوت', price: '4.50 د.ك', stock: 12, status: 'low_stock' },
-  { id: 3, name: 'بسكويت شوكولاتة', category: 'سناكس', price: '0.30 د.ك', stock: 85, status: 'in_stock' },
-  { id: 4, name: 'مناديل مبللة', category: 'عناية', price: '0.55 د.ك', stock: 0, status: 'out_of_stock' },
-  { id: 5, name: 'مشروب طاقة', category: 'مشروبات', price: '1.20 د.ك', stock: 42, status: 'in_stock' },
+  { id: 1, name: 'مياه معدنية 500 مل', category: 'مشروبات', price: '0.15 جنيه مصري', stock: 124, status: 'in_stock' },
+  { id: 2, name: 'زيت محرك 10W-40', category: 'زيوت', price: '4.50 جنيه مصري', stock: 12, status: 'low_stock' },
+  { id: 3, name: 'بسكويت شوكولاتة', category: 'سناكس', price: '0.30 جنيه مصري', stock: 85, status: 'in_stock' },
+  { id: 4, name: 'مناديل مبللة', category: 'عناية', price: '0.55 جنيه مصري', stock: 0, status: 'out_of_stock' },
+  { id: 5, name: 'مشروب طاقة', category: 'مشروبات', price: '1.20 جنيه مصري', stock: 42, status: 'in_stock' },
 ];
 
 export default function StoreView() {
@@ -55,7 +55,7 @@ export default function StoreView() {
             <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">+18%</span>
           </div>
           <p className="text-slate-500 text-sm font-medium mb-1">مبيعات المتجر اليوم</p>
-          <h3 className="text-2xl font-display font-bold text-slate-900">345 د.ك</h3>
+          <h3 className="text-2xl font-display font-bold text-slate-900">345 جنيه مصري</h3>
         </div>
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <div className="flex justify-between items-start mb-4">

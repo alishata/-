@@ -12,7 +12,8 @@ import {
   Search,
   Menu,
   X,
-  LogOut
+  LogOut,
+  MapPin
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils';
@@ -41,10 +42,11 @@ const SidebarItem = ({ icon: Icon, label, active, onClick }: SidebarItemProps) =
   </button>
 );
 
-export default function DashboardLayout({ children, activeTab, setActiveTab }: { 
+export default function DashboardLayout({ children, activeTab, setActiveTab, currentUser }: { 
   children: React.ReactNode, 
   activeTab: string, 
-  setActiveTab: (tab: string) => void 
+  setActiveTab: (tab: string) => void,
+  currentUser?: any
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -54,6 +56,7 @@ export default function DashboardLayout({ children, activeTab, setActiveTab }: {
     { id: 'sales', icon: Zap, label: 'المبيعات والمضخات' },
     { id: 'employees', icon: Users, label: 'الموظفين والورديات' },
     { id: 'store', icon: ShoppingCart, label: 'المتجر المصاحب' },
+    { id: 'locations', icon: MapPin, label: 'مواقع المحطات' },
   ];
 
   return (
@@ -64,7 +67,7 @@ export default function DashboardLayout({ children, activeTab, setActiveTab }: {
           <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-100">
             <Fuel size={24} />
           </div>
-          <h1 className="text-xl font-display font-bold text-slate-900 tracking-tight">GasStation Pro</h1>
+          <h1 className="text-xl font-display font-bold text-slate-900 tracking-tight">محطة الهواري</h1>
         </div>
 
         <nav className="flex-1 space-y-2">
@@ -115,7 +118,7 @@ export default function DashboardLayout({ children, activeTab, setActiveTab }: {
                 <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white">
                   <Fuel size={24} />
                 </div>
-                <h1 className="text-xl font-display font-bold text-slate-900">GasStation Pro</h1>
+                <h1 className="text-xl font-display font-bold text-slate-900">محطة الهواري</h1>
               </div>
               <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-slate-400 hover:text-slate-600">
                 <X size={24} />
@@ -168,12 +171,12 @@ export default function DashboardLayout({ children, activeTab, setActiveTab }: {
             <div className="h-10 w-px bg-slate-200 mx-2 hidden sm:block"></div>
             <div className="flex items-center gap-3 pl-2">
               <div className="text-left hidden sm:block">
-                <p className="text-sm font-semibold text-slate-900">أحمد محمد</p>
-                <p className="text-xs text-slate-500">مدير المحطة</p>
+                <p className="text-sm font-semibold text-slate-900">{currentUser?.name || 'علي الهواري'}</p>
+                <p className="text-xs text-slate-500">{currentUser?.role || 'مدير المحطة'}</p>
               </div>
               <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden relative">
                 <Image 
-                  src="https://picsum.photos/seed/admin/100/100" 
+                  src={`https://picsum.photos/seed/${currentUser?.username || 'admin'}/100/100`} 
                   alt="Avatar" 
                   fill 
                   className="object-cover"

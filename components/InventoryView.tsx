@@ -25,12 +25,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
-export default function InventoryView() {
-  const [inventory, setInventory] = useState([
-    { name: 'بنزين 85', current: 12500, capacity: 25000, color: '#10b981' },
-    { name: 'بنزين 92', current: 8400, capacity: 25000, color: '#3b82f6' },
-    { name: 'ديزل', current: 22100, capacity: 25000, color: '#f59e0b' },
-  ]);
+export default function InventoryView({ inventory, setInventory }: any) {
   const [showToast, setShowToast] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedTank, setSelectedTank] = useState('بنزين 85');
@@ -45,7 +40,7 @@ export default function InventoryView() {
     const amount = parseFloat(addAmount);
     if (isNaN(amount) || amount <= 0) return;
 
-    setInventory(prev => prev.map(tank => {
+    setInventory((prev: any) => prev.map((tank: any) => {
       if (tank.name === selectedTank) {
         const newCurrent = Math.min(tank.capacity, tank.current + amount);
         return { ...tank, current: newCurrent };
@@ -100,7 +95,7 @@ export default function InventoryView() {
                     onChange={(e) => setSelectedTank(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
                   >
-                    {inventory.map(t => <option key={t.name} value={t.name}>{t.name}</option>)}
+                    {inventory.map((t: any) => <option key={t.name} value={t.name}>{t.name}</option>)}
                   </select>
                 </div>
 
@@ -159,7 +154,7 @@ export default function InventoryView() {
 
       {/* Tank Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {inventory.map((tank, idx) => {
+        {inventory.map((tank: any, idx: number) => {
           const percentage = Math.round((tank.current / tank.capacity) * 100);
           const isLow = percentage < 25;
 

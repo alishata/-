@@ -7,24 +7,55 @@ import InventoryView from '@/components/InventoryView';
 import SalesView from '@/components/SalesView';
 import EmployeesView from '@/components/EmployeesView';
 import StoreView from '@/components/StoreView';
+import LocationsView from '@/components/LocationsView';
 import LockScreen from '@/components/LockScreen';
 import { motion, AnimatePresence } from 'motion/react';
 
 const LOCK_TIMEOUT = 10 * 60 * 1000; // 10 minutes in milliseconds
-const SYSTEM_PASSWORD = '1234'; // Default system password
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isLocked, setIsLocked] = useState(true);
   const [lastActivity, setLastActivity] = useState(() => Date.now());
+  
+  // Multi-user state
+  const [users, setUsers] = useState([
+    { username: 'admin', password: '1234', role: 'مدير المحطة', name: 'علي الهواري' },
+    { username: 'user1', password: '0000', role: 'مشرف وردية', name: 'محمد علي' },
+  ]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  // Shared State
+  const [inventory, setInventory] = useState([
+    { name: 'بنزين 85', current: 12500, capacity: 25000, color: '#10b981' },
+    { name: 'بنزين 92', current: 8400, capacity: 25000, color: '#3b82f6' },
+    { name: 'ديزل', current: 22100, capacity: 25000, color: '#f59e0b' },
+  ]);
+
+  const [employees, setEmployees] = useState([
+    { id: 1, name: 'محمد العتيبي', role: 'مشرف وردية', status: 'present', shift: 'الصباحية', avatar: 'https://picsum.photos/seed/emp1/100/100' },
+    { id: 2, name: 'سالم الدوسري', role: 'عامل مضخة', status: 'present', shift: 'الصباحية', avatar: 'https://picsum.photos/seed/emp2/100/100' },
+    { id: 3, name: 'فهد القحطاني', role: 'عامل مضخة', status: 'absent', shift: 'المسائية', avatar: 'https://picsum.photos/seed/emp3/100/100' },
+    { id: 4, name: 'خالد الشمري', role: 'محاسب متجر', status: 'present', shift: 'الصباحية', avatar: 'https://picsum.photos/seed/emp4/100/100' },
+    { id: 5, name: 'عبدالله المطيري', role: 'عامل مضخة', status: 'on_leave', shift: '---', avatar: 'https://picsum.photos/seed/emp5/100/100' },
+  ]);
+
+  const [stats, setStats] = useState({
+    totalRevenue: 2450,
+    totalFuelSold: 12400,
+    totalTransactions: 452,
+  });
 
   const lockSystem = useCallback(() => {
     setIsLocked(true);
+    setCurrentUser(null);
   }, []);
 
   const handleUnlock = (password: string) => {
-    if (password === SYSTEM_PASSWORD) {
+    const user = users.find(u => u.password === password);
+    if (user) {
       setIsLocked(false);
+      setCurrentUser(user);
       setLastActivity(Date.now());
       return true;
     }
@@ -64,17 +95,19 @@ export default function Home() {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <DashboardView />;
+        return <DashboardView inventory={inventory} stats={stats} setStats={setStats} setInventory={setInventory} />;
       case 'inventory':
-        return <InventoryView />;
+        return <InventoryView inventory={inventory} setInventory={setInventory} />;
       case 'sales':
-        return <SalesView />;
+        return <SalesView inventory={inventory} setInventory={setInventory} stats={stats} setStats={setStats} />;
       case 'employees':
-        return <EmployeesView />;
+        return <EmployeesView users={users} setUsers={setUsers} employees={employees} setEmployees={setEmployees} />;
       case 'store':
         return <StoreView />;
+      case 'locations':
+        return <LocationsView />;
       default:
-        return <DashboardView />;
+        return <DashboardView inventory={inventory} stats={stats} setStats={setStats} setInventory={setInventory} />;
     }
   };
 
@@ -94,7 +127,7 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+      <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab} currentUser={currentUser}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
