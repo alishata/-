@@ -1,0 +1,14 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-display: var(--font-display);
+}
+
+@layer base {
+  body {
+    @apply font-sans;
+  }
+}
